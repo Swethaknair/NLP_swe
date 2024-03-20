@@ -1,27 +1,31 @@
 import random
-def generate_bigram_model(text):
-    words = text.split()
-    bigrams = [(words[i], words[i + 1]) for i in range(len(words) - 1)]
-    model = {}
-    for word1, word2 in bigrams:
-        if word1 in model:
-            model[word1].append(word2)
-        else:
-            model[word1] = [word2]
-    return model
-def generate_text_bigram(model, num_words=50):
-    current_word = random.choice(list(model.keys()))
-    text = current_word
-    for _ in range(num_words - 1):
-        if current_word in model:
-            next_word = random.choice(model[current_word])
-            text += " " + next_word
-            current_word = next_word
-        else:
+
+def build_bigram_model(corpus):
+    bigram_model = {}
+    for sentence in corpus:
+        words = sentence.split()
+        for i in range(len(words) - 1):
+            bigram_model.setdefault(words[i], []).append(words[i + 1])
+    return bigram_model
+
+def generate_text(bigram_model, seed_word, length=10):
+    generated_text = [seed_word]
+    for _ in range(length - 1):
+        next_word = random.choice(bigram_model.get(generated_text[-1], []))
+        if not next_word:
             break
-    return text
-text = input("Enter your text: ")
-model = generate_bigram_model(text)
-generated_text = generate_text_bigram(model)
-print("Generated text:")
-print(generated_text)
+        generated_text.append(next_word)
+    return ' '.join(generated_text)
+
+# Example usage
+corpus = [
+    "This is a sample sentence.",
+    "A sample sentence is what we have here.",
+    "Here is another example for testing.",
+    "Testing the bigram model implementation."
+]
+
+bigram_model = build_bigram_model(corpus)
+seed_word = "This"
+generated_text = generate_text(bigram_model, seed_word, length=8)
+print("Generated Text:", generated_text)
