@@ -1,0 +1,23 @@
+import nltk
+from nltk.tokenize import sent_tokenize
+from nltk.corpus import stopwords
+from nltk.probability import FreqDist
+
+document = """
+Natural language processing (NLP) is a subfield of artificial intelligence (AI) that focuses on the interaction between computers and humans through natural language. NLP technologies are used to process, analyze, and understand large amounts of natural language data.
+
+One of the primary applications of NLP is sentiment analysis, which determines the sentiment or emotional tone of a piece of text. Sentiment analysis is widely used in social media monitoring, customer feedback analysis, and brand reputation management. Text summarization is another important NLP task. Extractive summarization involves selecting a subset of sentences from a text to create a shorter version that retains the most critical information. Abstractive summarization, on the other hand, generates a summary by paraphrasing and rephrasing the original text.
+"""
+
+def extractive_summarization(text, num_sentences=2):
+    sentences = sent_tokenize(text)
+    words = [word.lower() for sentence in sentences for word in nltk.word_tokenize(sentence)]
+    stopwords_list = set(stopwords.words('english'))
+    filtered_words = [word for word in words if word.isalnum() and word not in stopwords_list]
+    word_freq = FreqDist(filtered_words)
+    ranked_sentences = sorted(sentences, key=lambda sentence: sum(word_freq[word] for word in nltk.word_tokenize(sentence.lower()) if word.isalnum() and word not in stopwords_list), reverse=True)
+    summary = ' '.join(ranked_sentences[:num_sentences])
+    return summary
+
+summary = extractive_summarization(document)
+print(summary)
